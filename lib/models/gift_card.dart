@@ -3,7 +3,8 @@ class GiftCardOption {
   final String storeName;
   final int amountClp;
   final int costCoins;
-  final String imageUrl; // Placeholder for store logo
+  final String imageUrl;
+  final String type; // Placeholder for store logo
 
   GiftCardOption({
     required this.id,
@@ -11,6 +12,7 @@ class GiftCardOption {
     required this.amountClp,
     required this.costCoins,
     required this.imageUrl,
+    required this.type,
   });
 }
 

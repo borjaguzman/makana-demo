@@ -54,19 +54,26 @@ flutter run -d linux
 - **Catálogo de giftcards** en formato grid
 - Explicación clara del sistema
 
-### ✅ C) Catálogo de Giftcards
+### ✅ C) Catálogo de Giftcards (Mejorado)
 Tiendas disponibles:
 - **Unimarc**: $5.000 (2.500 coins), $10.000 (5.000 coins)
 - **Paris**: $5.000 (2.500 coins), $10.000 (5.000 coins)
 - **Falabella**: $20.000 (10.000 coins)
 - **Hugo Boss**: $50.000 (25.000 coins)
 
-Características:
+**Nuevas Funcionalidades:**
+- **Buscador**: Encuentra tiendas rápidamente por nombre
+- **Filtros**: Chips interactivos para filtrar por tienda específica
+- **Empty State**: Mensaje amigable cuando no hay resultados
 - Indicador visual de saldo suficiente/insuficiente
-- Formato de moneda chilena (CLP)
-- Cards deshabilitadas cuando no hay saldo
 
-### ✅ D) Confirmación de Canje
+### ✅ D) Historial de Transacciones (Nuevo)
+- Acceso desde el ícono de reloj en el dashboard
+- Lista cronológica de movimientos (ganancias y gastos)
+- Indicadores visuales (flecha verde/naranja)
+- Detalles de fecha y monto
+
+### ✅ E) Confirmación de Canje
 - Pantalla dedicada con resumen claro
 - Información: tienda, monto, costo en coins
 - Botón de confirmación explícito
@@ -227,8 +234,8 @@ dev_dependencies:
 
 ### Funcionalidad
 - [ ] **Filtros**: Por tienda, rango de precio
-- [ ] **Búsqueda**: De giftcards en el catálogo
-- [ ] **Historial**: De transacciones con detalles
+- [x] **Búsqueda**: De giftcards en el catálogo
+- [x] **Historial**: De transacciones con detalles ---- cabiar nombre de las transacciones
 - [ ] **Notificaciones**: Push al recibir coins
 - [ ] **Compartir**: Giftcard por WhatsApp/Email
 - [ ] **QR Code**: Generación de QR para códigos
@@ -304,15 +311,3 @@ Si es privado, dar acceso a: **cjjouanne**
 - **Plataforma**: Web (responsive, mobile-first)
 
 ---
-
-## 📄 Licencia
-
-Este proyecto es un desafío técnico para Makana.
-
----
-
-## 🙏 Notas Finales
-
-Este proyecto fue desarrollado con asistencia de IA (Gemini/Copilot) siguiendo las mejores prácticas de Flutter y priorizando UX accesible para todos los usuarios.
-
-Todas las decisiones técnicas pueden ser explicadas y justificadas en detalle durante la revisión.

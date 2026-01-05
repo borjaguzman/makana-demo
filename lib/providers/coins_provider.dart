@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/gift_card.dart';
+import '../models/transaction.dart';
 import '../services/mock_data_service.dart';
 
 class CoinsProvider with ChangeNotifier {
@@ -8,15 +9,65 @@ class CoinsProvider with ChangeNotifier {
   int _balance = 0;
   List<GiftCardOption> _catalog = [];
   List<RedeemedGiftCard> _myGiftCards = [];
+  List<Transaction> _transactions = [];
   
   bool _isLoading = false;
   String? _error;
+  
+  // Search and filter state
+  String _searchQuery = '';
+  Set<String> _selectedTypes = {};
+  PriceRange? _selectedPriceRange;
 
   int get balance => _balance;
   List<GiftCardOption> get catalog => _catalog;
   List<RedeemedGiftCard> get myGiftCards => _myGiftCards;
+  List<Transaction> get transactions => _transactions;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  String get searchQuery => _searchQuery;
+  Set<String> get selectedTypes => _selectedTypes;
+  PriceRange? get selectedPriceRange => _selectedPriceRange;
+  
+  // Filtered catalog based on search and filters
+  List<GiftCardOption> get filteredCatalog {
+    var filtered = _catalog;
+    
+    // Apply search filter
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((option) {
+        return option.storeName.toLowerCase().contains(_searchQuery.toLowerCase());
+      }).toList();
+    }
+    
+    // Apply type filter
+    if (_selectedTypes.isNotEmpty) {
+      filtered = filtered.where((option) {
+        return _selectedTypes.contains(option.type);
+      }).toList();
+    }
+    
+    // Apply price filter
+    if (_selectedPriceRange != null) {
+      filtered = filtered.where((option) {
+        switch (_selectedPriceRange!) {
+          case PriceRange.low:
+            return option.costCoins <= 5000;
+          case PriceRange.medium:
+            return option.costCoins > 5000 && option.costCoins <= 10000;
+          case PriceRange.high:
+            return option.costCoins > 10000;
+        }
+      }).toList();
+    }
+    
+    return filtered;
+  }
+  
+  // Get unique types for filter chips
+  List<String> get availableTypes {
+    return _catalog.map((option) => option.type).toSet().toList()..sort();
+  }
 
   CoinsProvider() {
     _initData();
@@ -28,6 +79,7 @@ class CoinsProvider with ChangeNotifier {
     try {
       _balance = await _service.getUserBalance();
       _catalog = await _service.getCatalog();
+      _transactions = await _service.getTransactionHistory();
     } catch (e) {
       _error = "Error cargando datos: $e";
     } finally {
@@ -51,6 +103,17 @@ class CoinsProvider with ChangeNotifier {
       final redeemed = await _service.redeemCoin(option);
       _balance -= option.costCoins;
       _myGiftCards.insert(0, redeemed); // Add to top of list
+      
+      // Add transaction record
+      _transactions.insert(0, Transaction(
+        id: 'txn_${DateTime.now().millisecondsSinceEpoch}',
+        type: TransactionType.spent,
+        amount: option.costCoins,
+        description: 'Canje ${option.storeName} - ${option.amountClp}',
+        date: DateTime.now(),
+        status: TransactionStatus.completed,
+        relatedGiftCardId: redeemed.id,
+      ));
       _isLoading = false;
       notifyListeners();
       return true;
@@ -66,4 +129,42 @@ class CoinsProvider with ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+  
+  // Search and filter methods
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+  
+  void toggleTypeFilter(String type) {
+    if (_selectedTypes.contains(type)) {
+      _selectedTypes.remove(type);
+    } else {
+      _selectedTypes.add(type);
+    }
+    notifyListeners();
+  }
+  
+  void setPriceFilter(PriceRange? range) {
+    // Toggle check
+    if (_selectedPriceRange == range) {
+      _selectedPriceRange = null;
+    } else {
+      _selectedPriceRange = range;
+    }
+    notifyListeners();
+  }
+  
+  void clearFilters() {
+    _searchQuery = '';
+    _selectedTypes.clear();
+    _selectedPriceRange = null;
+    notifyListeners();
+  }
+}
+
+enum PriceRange {
+  low,    // <= 5000
+  medium, // 5001 - 10000
+  high    // > 10000
 }

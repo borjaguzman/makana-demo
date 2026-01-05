@@ -24,18 +24,9 @@ class SlidePageRoute<T> extends PageRouteBuilder<T> {
 
             var offsetAnimation = animation.drive(tween);
 
-            // Fade effect
-            var fadeAnimation = CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeIn,
-            );
-
             return SlideTransition(
               position: offsetAnimation,
-              child: FadeTransition(
-                opacity: fadeAnimation,
-                child: child,
-              ),
+              child: child,
             );
           },
         );
