@@ -3,19 +3,30 @@ import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'providers/coins_provider.dart';
 import 'screens/home_entry_mock.dart';
+import 'services/storage_service.dart';
 
-void main() {
-  runApp(const MakanaDemoApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  final storageService = StorageService();
+  await storageService.init();
+  
+  runApp(MakanaDemoApp(storageService: storageService));
 }
 
 class MakanaDemoApp extends StatelessWidget {
-  const MakanaDemoApp({Key? key}) : super(key: key);
+  final StorageService storageService;
+
+  const MakanaDemoApp({
+    Key? key,
+    required this.storageService,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CoinsProvider()),
+        ChangeNotifierProvider(create: (_) => CoinsProvider(storageService)),
       ],
       child: MaterialApp(
         title: 'Makana Demo',

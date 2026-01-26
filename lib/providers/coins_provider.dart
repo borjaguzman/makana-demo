@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../models/gift_card.dart';
 import '../models/transaction.dart';
 import '../services/mock_data_service.dart';
+import '../services/storage_service.dart';
 
 class CoinsProvider with ChangeNotifier {
   final MockDataService _service = MockDataService();
+  final StorageService _storage;
 
   int _balance = 0;
   List<GiftCardOption> _catalog = [];
@@ -69,19 +71,31 @@ class CoinsProvider with ChangeNotifier {
     return _catalog.map((option) => option.type).toSet().toList()..sort();
   }
 
-  CoinsProvider() {
+  CoinsProvider(this._storage) {
     _initData();
   }
 
   Future<void> _initData() async {
+    // 1. Load from cache immediately
+    _balance = _storage.getBalance();
+    _myGiftCards = _storage.getGiftCards();
     _isLoading = true;
     notifyListeners();
+
+    // 2. Fetch from network
     try {
-      _balance = await _service.getUserBalance();
-      _catalog = await _service.getCatalog();
+      final serverBalance = await _service.getUserBalance();
+      final serverCatalog = await _service.getCatalog();
       _transactions = await _service.getTransactionHistory();
+      
+      // 3. Update state and cache
+      _balance = serverBalance;
+      _catalog = serverCatalog;
+      await _storage.saveBalance(_balance);
+      
     } catch (e) {
       _error = "Error cargando datos: $e";
+      // On error, we still have cached data shown
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -103,6 +117,10 @@ class CoinsProvider with ChangeNotifier {
       final redeemed = await _service.redeemCoin(option);
       _balance -= option.costCoins;
       _myGiftCards.insert(0, redeemed); // Add to top of list
+      
+      // Save changes to storage
+      await _storage.saveBalance(_balance);
+      await _storage.saveGiftCard(redeemed);
       
       // Add transaction record
       _transactions.insert(0, Transaction(
