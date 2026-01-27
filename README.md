@@ -48,20 +48,12 @@ A continuación se responden las preguntas clave sobre el diseño e implementaci
 - **Resumen Claro:** La pantalla de confirmación muestra explícitamente qué se compra y cuánto costará, requiriendo una segunda acción del usuario.
 - **Coste Visual:** Las opciones inalcanzables se muestran visualmente deshabilitadas/diferentes para evitar clicks frustrantes desde el inicio.
 
----
-
-## � Mejoras Futuras y Escalabilidad
-
-### ¿Cómo escalarías esto si hay 50 tiendas y miles de usuarios?
+### 4. ¿Cómo escalarías esto si hay 50 tiendas y miles de usuarios?
 Esta solución mock está diseñada para migrar a una arquitectura robusta:
 
 1.  **Backend & Paginación (API):** Reemplazar la carga total por *paginación server-side* (infinite scroll) en el catálogo. No cargar 50 tiendas de golpe, sino bajo demanda.
 2.  **Búsqueda en Servidor:** Mover la lógica de filtrado del cliente al backend (ElasticSearch o consultas SQL optimizadas) para búsquedas instantáneas entre miles de items.
 3.  **Caching:** Implementar caché de imágenes y respuestas HTTP para reducir la carga de datos en dispositivos de usuarios frecuentes.
-4.  **Gestor de Estado:** Migrar de `Provider` simple a **Bloc** o **Riverpod** para manejar estados más complejos y flujos asíncronos concurrentes de manera más segura y testea
-ble.
 
-### Otras Mejoras Pendientes
-- **Tests Automatizados:** Aumentar cobertura de Widget y Integration tests.
-- **Animaciones:** Refinar transiciones de elementos compartidos (Hero animations) entre lista y detalle.
-- **Accesibilidad:** Pruebas completas con lectores de pantalla (TalkBack/VoiceOver).
+
+
